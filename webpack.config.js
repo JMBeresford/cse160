@@ -50,5 +50,6 @@ module.exports = {
     port: 9000,
     hot: true,
     liveReload: true,
+    watchFiles: ['src/**/*'],
   },
 };
