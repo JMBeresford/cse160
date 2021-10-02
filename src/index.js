@@ -1,6 +1,6 @@
 import './style.css';
 import { Matrix4 } from '../lib/cuon-matrix-cse160';
-import { init } from './utils';
+import { init, clearCanvas } from './utils';
 
 // create a point at origin and draw it
 const example = (gl) => {
@@ -84,3 +84,7 @@ const gl = init();
 
 const vBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+
+document.getElementById('clear').onclick = () => {
+  clearCanvas(gl);
+};
