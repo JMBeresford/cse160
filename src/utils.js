@@ -35,4 +35,4 @@ const init = () => {
   return gl;
 };
 
-export { init };
+export { init, clearCanvas };
