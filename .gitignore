@@ -105,4 +105,5 @@ dist
 
 # etc
 .DS_Store
-*.DS_Store
+*/.DS_Store
+*/**/.DS_Store
