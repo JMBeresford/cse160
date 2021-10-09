@@ -12,11 +12,7 @@
       Please use a browser that supports the canvas element
     </canvas>
 
-    <div class="buttons">
-      <button id="clear">Clear Canvas</button>
-      <button id="funk">Activate Funk</button>
-    </div>
-
+    <button id="clear">Clear Canvas</button>
     <div class="shapeSelection">
       <strong>Shape:</strong>
       <select name="shape" id="shape">
@@ -25,34 +21,19 @@
         <option value="circle">Circle</option>
       </select>
     </div>
-
-    <div class="options">
-      <h3>Options</h3>
-      <h5>Scale:</h5>
-      <input
-        type="range"
-        name="scale"
-        id="scale"
-        min="0.05"
-        max="0.7"
-        step="0.001"
-        value="0.1"
-      />
-      <h5 class="segs">Circle Segments (10):</h5>
-      <input
-        type="range"
-        name="segments"
-        id="segments"
-        value="10"
-        min="5"
-        max="32"
-        step="1"
-      />
-    </div>
+    <strong>Scale:</strong>
+    <input
+      type="range"
+      name="scale"
+      id="scale"
+      min="0.05"
+      max="0.7"
+      step="0.001"
+      value="0.1"
+    />
 
     <div class="color">
-      <h3>Color</h3>
-      <h5>Red:</h5>
+      <strong>Red:</strong>
       <input
         type="range"
         name="red"
@@ -62,7 +43,7 @@
         step="0.01"
         value="0"
       />
-      <h5>Green:</h5>
+      <strong>Green:</strong>
       <input
         type="range"
         name="green"
@@ -72,7 +53,7 @@
         step="0.01"
         value="0"
       />
-      <h5>Blue:</h5>
+      <strong>Blue:</strong>
       <input
         type="range"
         name="blue"
@@ -84,6 +65,17 @@
       />
     </div>
 
-    <div class="segs"></div>
+    <div class="segs">
+      <strong>Circle Segments (10):</strong>
+      <input
+        type="range"
+        name="segments"
+        id="segments"
+        value="10"
+        min="5"
+        max="32"
+        step="1"
+      />
+    </div>
   </body>
 </html>

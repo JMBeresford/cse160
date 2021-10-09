@@ -2,6 +2,23 @@ import './style.css';
 import { Matrix4 } from '../lib/cuon-matrix-cse160';
 import { init, clearCanvas } from './utils';
 
+// create a point at origin and draw it
+const example = (gl) => {
+  const vertices = new Float32Array([0, 0, 0]);
+
+  const vBuffer = gl.createBuffer();
+
+  // assign attributes
+  gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+  const aPositionPtr = gl.getAttribLocation(gl.program, 'aPosition');
+  gl.vertexAttribPointer(aPositionPtr, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(aPositionPtr);
+
+  // draw the point
+  gl.drawArrays(gl.POINTS, 0, 1);
+};
+
 const initVertices = (gl, shape, segments) => {
   switch (shape) {
     case 'triangle': {
@@ -49,7 +66,7 @@ const initVertices = (gl, shape, segments) => {
     }
   }
 
-  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STREAM_DRAW);
   const aPositionPtr = gl.getAttribLocation(gl.program, 'aPosition');
   gl.vertexAttribPointer(aPositionPtr, 2, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(aPositionPtr);
@@ -174,7 +191,7 @@ if (gl) {
 
   document.getElementById('segments').onchange = (e) => {
     document.querySelector(
-      '.segs'
+      '.segs strong'
     ).textContent = `Circle Segments (${e.target.value}):`;
   };
 
