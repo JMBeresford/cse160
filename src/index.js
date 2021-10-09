@@ -57,7 +57,7 @@ const initVertices = (gl, shape, segments) => {
   vertices = null;
 };
 
-const drawShapes = (e, gl) => {
+const drawShapes = (e) => {
   let shape = document.getElementById('shape').value;
   let scale = document.getElementById('scale').value;
   let segments = parseInt(document.getElementById('segments').value);
@@ -77,74 +77,101 @@ const drawShapes = (e, gl) => {
   states.colors.push(r);
   states.colors.push(g);
   states.colors.push(b);
+};
 
-  const uScaleMatrixPtr = gl.getUniformLocation(gl.program, 'uScaleMatrix');
-  const uTranslationMatrixPtr = gl.getUniformLocation(
-    gl.program,
-    'uTranslationMatrix'
-  );
-  const uColorPtr = gl.getUniformLocation(gl.program, 'uColor');
-
-  var translationMatrix = new Matrix4();
-  let scaleMatrix = new Matrix4();
-
-  clearCanvas(gl);
-
-  var lastShape = states.shapes[0];
-  var lastSegments = states.segments[0];
-  initVertices(gl, lastShape, lastSegments);
-
-  for (var i = 0; i < states.shapes.length; i++) {
-    if (lastShape !== states.shapes[i]) {
-      lastShape = states.shapes[i];
-      initVertices(gl, lastShape, lastSegments);
-    }
-
-    if (lastSegments !== states.segments[i]) {
-      lastSegments = states.segments[i];
-      initVertices(gl, lastShape, lastSegments);
-    }
-
-    scaleMatrix.setScale(states.scales[i], states.scales[i], 0);
-    translationMatrix.setTranslate(
-      states.clicks[i * 2],
-      states.clicks[i * 2 + 1],
-      0
+const render = (gl) => {
+  if (states.shapes.length > 0) {
+    const uScaleMatrixPtr = gl.getUniformLocation(gl.program, 'uScaleMatrix');
+    const uTranslationMatrixPtr = gl.getUniformLocation(
+      gl.program,
+      'uTranslationMatrix'
+    );
+    const uColorPtr = gl.getUniformLocation(gl.program, 'uColor');
+    const uRotationMatrixPtr = gl.getUniformLocation(
+      gl.program,
+      'uRotationMatrix'
     );
 
-    // assign uniforms
-    gl.uniformMatrix4fv(uScaleMatrixPtr, false, scaleMatrix.elements);
-    gl.uniformMatrix4fv(
-      uTranslationMatrixPtr,
-      false,
-      translationMatrix.elements
-    );
+    var translationMatrix = new Matrix4();
+    let scaleMatrix = new Matrix4();
+    let rotationMatrix = new Matrix4();
 
-    gl.uniform3f(
-      uColorPtr,
-      states.colors[i * 3],
-      states.colors[i * 3 + 1],
-      states.colors[i * 3 + 2]
-    );
+    clearCanvas(gl);
 
-    switch (lastShape) {
-      case 'triangle': {
-        gl.drawArrays(gl.TRIANGLES, 0, 3);
-        break;
+    var lastShape = states.shapes[0];
+    var lastSegments = states.segments[0];
+    initVertices(gl, lastShape, lastSegments);
+
+    for (var i = 0; i < states.shapes.length; i++) {
+      if (lastShape !== states.shapes[i]) {
+        lastShape = states.shapes[i];
+        initVertices(gl, lastShape, lastSegments);
       }
-      case 'square': {
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-        break;
+
+      if (lastSegments !== states.segments[i]) {
+        lastSegments = states.segments[i];
+        initVertices(gl, lastShape, lastSegments);
       }
-      case 'circle': {
-        gl.drawArrays(gl.TRIANGLE_FAN, 0, states.segments[i] + 2);
-        break;
+
+      let factor = 1;
+
+      if (states.funk) {
+        factor = Math.sin(Date.now() / 250);
+      }
+
+      rotationMatrix.setRotate(factor * 360, 0, 0, 1);
+
+      scaleMatrix.setScale(
+        states.scales[i] * Math.abs(factor),
+        states.scales[i] * Math.abs(factor),
+        0
+      );
+
+      translationMatrix.setTranslate(
+        states.clicks[i * 2],
+        states.clicks[i * 2 + 1],
+        0
+      );
+
+      // assign uniforms
+      gl.uniformMatrix4fv(uScaleMatrixPtr, false, scaleMatrix.elements);
+      gl.uniformMatrix4fv(uRotationMatrixPtr, false, rotationMatrix.elements);
+      gl.uniformMatrix4fv(
+        uTranslationMatrixPtr,
+        false,
+        translationMatrix.elements
+      );
+
+      gl.uniform3f(
+        uColorPtr,
+        states.colors[i * 3],
+        states.colors[i * 3 + 1],
+        states.colors[i * 3 + 2]
+      );
+
+      switch (lastShape) {
+        case 'triangle': {
+          gl.drawArrays(gl.TRIANGLES, 0, 3);
+          break;
+        }
+        case 'square': {
+          gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+          break;
+        }
+        case 'circle': {
+          gl.drawArrays(gl.TRIANGLE_FAN, 0, states.segments[i] + 2);
+          break;
+        }
       }
     }
+
+    scaleMatrix = null;
+    translationMatrix = null;
   }
 
-  scaleMatrix = null;
-  translationMatrix = null;
+  requestAnimationFrame(() => {
+    render(gl);
+  });
 };
 
 // init webGL context
@@ -156,7 +183,7 @@ const states = {
   shapes: [],
   colors: [],
   segments: [],
-  dragging: false,
+  funk: false,
 };
 
 if (gl) {
@@ -172,6 +199,11 @@ if (gl) {
     clearCanvas(gl);
   };
 
+  document.getElementById('funk').onclick = (e) => {
+    e.target.classList.toggle('enabled');
+    states.funk = !states.funk;
+  };
+
   document.getElementById('segments').onchange = (e) => {
     document.querySelector(
       '.segs'
@@ -182,6 +214,8 @@ if (gl) {
   gl.canvas.onmousemove = (e) => {
     e.buttons === 1 ? drawShapes(e, gl) : null;
   };
+
+  render(gl);
 } else {
   console.error('There was an error getting the webGL context');
 }
