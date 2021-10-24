@@ -1,6 +1,5 @@
 import { Vector3, Matrix4 } from '../../lib/cuon-matrix-cse160';
-import defaultVertexShader from './shaders/default.vert';
-import defaultFragmentShader from './shaders/default.frag';
+import { createProgram } from '../../lib/cuon-utils';
 
 let _scaleMatrix = new Matrix4();
 let _rotMatrix = new Matrix4();
@@ -18,20 +17,25 @@ class Attribute {
 
     this.countPerVertex = count;
     this.name = name;
+    this.buffer = null;
+    this.location = null;
   }
 }
 
 class Uniform {
-  constructor(array, count, name, type) {
+  constructor(array, count, type) {
     if (Array.isArray(array)) {
       this.value = new Float32Array(array);
+    } else if (array === null) {
+      this.value = new Float32Array(count);
     } else {
       this.value = array;
     }
 
     this.count = count;
-    this.name = name;
     this.type = type;
+
+    this.location = null;
   }
 }
 
@@ -58,27 +62,35 @@ class Object3D {
     this.children = [];
 
     // object data
-    this.color = new Vector3([1, 1, 1]);
     this.matrix = new Matrix4();
     this.matrixWorld = new Matrix4();
     this.renderMatrix = new Matrix4();
     this.up = new Vector3([0, 1, 0]);
     this.drawMode = 'static';
     this.drawType = 'triangles';
-    this.visible = true;
+    this.visible = false;
+    this.transparent = false;
     this.attributes = [
-      // new Attribute([0, 0, 0], 3, aPosition), ex: a single vertex
+      // new Attribute([0, 0, 0], 3, aPosition), example: a single vertex
     ];
-    this.uniforms = [
-      // new Uniform([1,0,0], 3, 'uColor', 'vec3'), ex: the color red as uniform
-      new Uniform([0, 0], 2, 'uMouse', 'vec2'),
-    ];
-    this.indices = []; // indices of vertices to draw triangles from, in order
-
-    this.shaders = {
-      vertex: defaultVertexShader,
-      fragment: defaultFragmentShader,
+    this.uniforms = {
+      // default uniforms
+      uMouse: new Uniform(null, 2, 'vec2'),
+      uTime: new Uniform(null, 1, 'float'),
+      uResolution: new Uniform(null, 2, 'vec2'),
+      viewMatrix: new Uniform(null, 16, 'mat4'),
+      projectionMatrix: new Uniform(null, 16, 'mat4'),
+      modelMatrix: new Uniform(null, 16, 'mat4'),
+      uColor: new Uniform(new Float32Array([1, 1, 1]), 3, 'vec3'),
     };
+
+    this.indices = []; // indices of vertices to draw triangles from, in order
+    this.indexBuffer = null;
+    this.indexLocation = null;
+    this.userData = {};
+
+    // shader program, will be compiled manually
+    this.program = null;
 
     this.autoUpdateMatrix = true;
 
@@ -86,21 +98,6 @@ class Object3D {
     this.calculateRotationMatrix();
     this.calculateTranslationMatrix();
     this.recalculateMatrix();
-
-    this.uniforms.push(
-      new Uniform(
-        this.matrix.elements,
-        this.matrix.elements.length,
-        'modelMatrix',
-        'mat4'
-      ),
-      new Uniform(
-        this.color.elements,
-        this.color.elements.length,
-        'uColor',
-        'vec3'
-      )
-    );
   }
 
   add(children) {
@@ -120,6 +117,12 @@ class Object3D {
 
     child.parent = null;
     this.children.splice(idx, 1);
+  }
+
+  getAlphaOrderedChildren() {
+    return this.children.sort((a, b) => {
+      return a.transparent ? 1 : -1;
+    });
   }
 
   setPosition(x, y, z) {
@@ -200,18 +203,18 @@ class Object3D {
     return [...this.up.elements];
   }
 
-  setVertexShader(vert) {
-    this.shaders.vertex = vert;
-  }
+  setShaderProgram(gl, vert, frag) {
+    this.program = createProgram(gl, vert, frag);
 
-  setFragmentShader(frag) {
-    this.shaders.fragment = frag;
+    if (!this.program) {
+      console.warn(`Failed to compile program for ${this}`);
+    }
   }
 
   traverse(callback) {
     callback(this);
 
-    for (let child of this.children) {
+    for (let child of this.getAlphaOrderedChildren()) {
       child.traverse(callback);
     }
   }
@@ -219,20 +222,14 @@ class Object3D {
   setColor(r, g, b) {
     if (Array.isArray(r)) {
       for (let i = 0; i < 3; i++) {
-        this.color.elements[i] = r[i];
+        this.uniforms.uColor.value[i] = r[i];
       }
     } else if (r.elements) {
-      this.color.set(r);
+      this.uniforms.uColor.value.set(r);
     } else {
-      this.color.elements[0] = r;
-      this.color.elements[1] = g;
-      this.color.elements[2] = b;
-    }
-
-    let u = this.uniforms.find((u) => u.name === 'uColor');
-
-    if (u) {
-      u.value = this.color.elements;
+      this.uniforms.uColor.value[0] = r;
+      this.uniforms.uColor.value[1] = g;
+      this.uniforms.uColor.value[2] = b;
     }
   }
 
@@ -293,16 +290,14 @@ class Object3D {
   }
 
   recalculateMatrix() {
-    this.calculateMatrix();
+    if (this.autoUpdateMatrix) {
+      this.calculateMatrix();
+    }
     this.calculateWorldMatrix();
 
     this.renderMatrix.set(this.matrixWorld).multiply(this.scaleMatrix);
 
-    let u = this.uniforms.find((u) => u.name === 'modelMatrix');
-
-    if (u) {
-      u.value = this.renderMatrix.elements;
-    }
+    this.uniforms.modelMatrix.value.set(this.renderMatrix.elements);
   }
 }
 

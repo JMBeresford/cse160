@@ -1,14 +1,16 @@
+precision mediump float;
+
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
 
-attribute vec3 aPosition;
-attribute vec3 aColor;
+uniform float uTime;
 
-varying vec3 vColor;
+attribute vec3 aPosition;
 
 void main() {
-  vColor = aColor;
+  vec3 pos = aPosition;
 
+  gl_PointSize = 30.0 + sin(uTime * 3.0) * 15.0;
   gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(aPosition, 1.0);
 }
