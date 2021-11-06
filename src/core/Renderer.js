@@ -39,7 +39,7 @@ class Renderer {
     this.gl.clearColor(0, 0, 0, 1);
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.enable(this.gl.BLEND);
-    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+    this.gl.blendFunc(this.gl.ONE, this.gl.ONE_MINUS_SRC_ALPHA);
     this.clear();
   }
 
@@ -222,7 +222,7 @@ class Renderer {
     }
 
     if (obj.indices !== null) {
-      if (!obj.indexBuffer) {
+      if (obj.indexBuffer === null) {
         obj.indexBuffer = this.gl.createBuffer();
       }
 
@@ -236,7 +236,7 @@ class Renderer {
       this.gl.drawElements(
         drawType,
         obj.indices.length,
-        this.gl.UNSIGNED_BYTE,
+        this.gl.UNSIGNED_SHORT,
         0
       );
     } else {

@@ -68,7 +68,7 @@ class Object3D {
     this.matrixWorld = new Matrix4();
     this.renderMatrix = new Matrix4();
     this.up = new Vector3([0, 1, 0]);
-    this.drawMode = 'dynamic';
+    this.drawMode = 'static';
     this.drawType = 'triangles';
     this.visible = false;
     this.transparent = false;

@@ -130,7 +130,7 @@ class PointerLockControls {
     }
   };
 
-  update = () => {
+  update() {
     if (this.state.left) {
       const [x, y, z] = this.camera.getPosition();
 
@@ -216,7 +216,7 @@ class PointerLockControls {
 
       this.camera.setRotation(x, y - dx, z);
     }
-  };
+  }
 }
 
 export { PointerLockControls };
