@@ -150,7 +150,7 @@ class Cube extends Object3D {
       temp.push(i);
     }
 
-    this.indices = new Uint16Array(temp);
+    this.indices = new Uint8Array(temp);
     console.log(this);
   }
 }

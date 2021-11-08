@@ -246,7 +246,7 @@ class Renderer {
         let brightness = 1;
         let stagger = obj.indices.length / 6;
         for (let i = 0; i < obj.indices.length; i += stagger) {
-          this.gl.drawElements(drawType, stagger, this.gl.UNSIGNED_SHORT, i);
+          this.gl.drawElements(drawType, stagger, this.gl.UNSIGNED_BYTE, i);
           this.gl.uniform1f(uniformPtr, brightness);
           brightness -= 0.1;
         }
