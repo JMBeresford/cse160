@@ -6,8 +6,7 @@ import defaultFragmentShader from './shaders/default.frag';
 let _scaleMatrix = new Matrix4();
 let _rotMatrix = new Matrix4();
 let _translateMatrix = new Matrix4();
-let _matrix = new Matrix4();
-let _norm = new Matrix4().setScale(1, 1, 1);
+let _v1 = new Vector3();
 
 class Attribute {
   constructor(array, count, name) {
@@ -27,8 +26,14 @@ class Attribute {
 class Uniform {
   constructor(array, count, type) {
     if (Array.isArray(array)) {
+      if (type === 'int') {
+        this.value = new Uint8Array(array);
+      }
       this.value = new Float32Array(array);
     } else if (array === null) {
+      if (type === 'int') {
+        this.value = new Uint8Array(count);
+      }
       this.value = new Float32Array(count);
     } else {
       this.value = array;
@@ -147,6 +152,19 @@ class Object3D {
 
   getPosition() {
     return [...this.position.elements];
+  }
+
+  getWorldPosition() {
+    if (this.parent) {
+      var p = this.parent.getWorldPosition();
+    } else {
+      return this.getPosition();
+    }
+
+    _v1.set(p);
+    _v1.add(this.position);
+
+    return [..._v1.elements];
   }
 
   setScale(x, y, z) {

@@ -17,7 +17,7 @@ class Renderer {
 
     this.gl = getWebGLContext(canvas, false, {
       alpha: true,
-      premultipliedAlpha: true,
+      premultipliedAlpha: false,
     });
 
     window.addEventListener('resize', (e) => {
@@ -39,7 +39,7 @@ class Renderer {
     this.gl.clearColor(0, 0, 0, 1);
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.enable(this.gl.BLEND);
-    this.gl.blendFunc(this.gl.ONE, this.gl.ONE_MINUS_SRC_ALPHA);
+    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
     this.clear();
   }
 
@@ -213,6 +213,14 @@ class Renderer {
           this.gl.uniformMatrix4fv(uniformPtr, false, uniforms[name].value);
           break;
         }
+        case 'int': {
+          if (name === 'uTexture') {
+            this.gl.bindTexture(this.gl.TEXTURE_2D, obj.texture);
+            this.gl.activeTexture(this.gl.TEXTURE0);
+          }
+          this.gl.uniform1i(uniformPtr, ...uniforms[name].value);
+          break;
+        }
         default: {
           console.warn(
             `There was an error in the typing of your uniform ${name}`
@@ -233,15 +241,23 @@ class Renderer {
         this.gl.DYNAMIC_DRAW
       );
 
-      this.gl.drawElements(
-        drawType,
-        obj.indices.length,
-        this.gl.UNSIGNED_SHORT,
-        0
-      );
-    } else {
-      let aPos = obj.attributes.find((a) => a.name === 'aPosition');
-      this.gl.drawArrays(drawType, 0, aPos.value.length / 3);
+      if (obj.type === 'rock') {
+        let uniformPtr = uniforms['uBrightness'].location;
+        let brightness = 1;
+        let stagger = obj.indices.length / 6;
+        for (let i = 0; i < obj.indices.length; i += stagger) {
+          this.gl.drawElements(drawType, stagger, this.gl.UNSIGNED_SHORT, i);
+          this.gl.uniform1f(uniformPtr, brightness);
+          brightness -= 0.1;
+        }
+      } else {
+        this.gl.drawElements(
+          drawType,
+          obj.indices.length,
+          this.gl.UNSIGNED_SHORT,
+          0
+        );
+      }
     }
 
     this.gl.enable(this.gl.DEPTH_TEST);

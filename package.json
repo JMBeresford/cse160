@@ -24,7 +24,9 @@
   },
   "homepage": "https://github.com/JMBeresford/webGL_template#readme",
   "dependencies": {
+    "cannon": "^0.6.2",
     "css-loader": "^6.3.0",
+    "file-loader": "^6.2.0",
     "glsl-noise": "^0.0.0",
     "glslify": "^7.1.1",
     "glslify-loader": "^2.0.0",

@@ -55,8 +55,8 @@ vec4 Stars(vec2 uv, float uTime) {
 
 
 void main() {
-  float fogStr = S(0.93, 0.98, 1.0 - vUv.y);
-  vec4 finalColor = vec4(0.0588, 0.0314, 0.1059, 1.0) * (1.0 - fogStr);
+  float fogStr = S(0.92, 0.98, 1.0 - vUv.y);
+  vec4 finalColor = vec4(0.0588, 0.0314, 0.1059, 1.0);
   vec4 cloudColor = vec4(0.0588, 0.0353, 0.0941, 1.0);
   vec4 cloudColor2 =vec4(0.102, 0.0392, 0.098, 1.0);
   vec4 fogColor = vec4(0.7686, 0.7098, 0.8745, 1.0);
@@ -72,9 +72,9 @@ void main() {
   float noise = clamp(cnoise4(vec4(pos, uTime * 0.0005)), 0.0, 1.0);
   noise += clamp(snoise4(vec4(pos * 0.5, uTime * 0.0005 + 10000.0)), 0.0, 1.0);
 
-  finalColor += Stars(uv, uTime) * max(S(0.1, 0.6, noise), 0.1) * (1.0 - fogStr) * (1.0 - blackHole);
+  finalColor += Stars(uv, uTime) * max(S(0.1, 0.6, noise), 0.1) * (1.0 - blackHole);
   finalColor += S(0.0, 0.7, cloudStr) * cloudColor * (1.0 - blackHole);
-  finalColor += fogStr * fogColor;
+  finalColor = mix(finalColor, fogStr * fogColor, fogStr);
 
   vec3 flareColor = vec3(0.7686, 0.7098, 0.8745);
 

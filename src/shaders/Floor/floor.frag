@@ -8,8 +8,8 @@ varying vec3 vPos;
 
 #pragma glslify: cnoise3 = require(glsl-noise/simplex/3d)
 
-#define FOG_START 0.0
-#define FOG_END 5.0
+#define FOG_START 5.0
+#define FOG_END 20.0
 
 void main() {
   // float fogFactor = pow(smoothstep(0.0, 1.0, vFogDist), 2.0);

@@ -6,12 +6,11 @@ var _v1 = new Vector3();
 var _v2 = new Vector3();
 
 class Controls extends PointerLockControls {
-  constructor(camera, canvas, world) {
-    super(camera, canvas);
+  constructor(camera, canvas, world, camBody) {
+    super(camera, canvas, camBody, false);
 
     this.world = world;
 
-    console.log(this);
     return this;
   }
 

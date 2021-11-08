@@ -4,7 +4,7 @@ var _v1 = new Vector3();
 var _v2 = new Vector3();
 
 class PointerLockControls {
-  constructor(camera, canvas, allowVerticalMovement = false) {
+  constructor(camera, canvas, camBody, allowVerticalMovement = false) {
     if (!camera || !canvas) {
       console.error('Camera constructor arguments are null');
       return;
@@ -12,6 +12,7 @@ class PointerLockControls {
 
     this.canvas = canvas;
     this.camera = camera;
+    this.camBody = camBody;
 
     this.state = {
       locked: false,
@@ -137,7 +138,7 @@ class PointerLockControls {
       _v1.set(this.camera.target);
       let dir = _v1.sub(this.camera.position).normalize();
 
-      let left = Vector3.cross(dir, this.camera.up).div(-10);
+      let left = Vector3.cross(dir, this.camera.up).div(-13);
 
       _v1.set([x, y, z]).add(left);
 
@@ -151,7 +152,7 @@ class PointerLockControls {
       _v1.set(this.camera.target);
       let dir = _v1.sub(this.camera.position).normalize();
 
-      let right = Vector3.cross(dir, this.camera.up).div(10);
+      let right = Vector3.cross(dir, this.camera.up).div(13);
 
       _v1.set([x, y, z]).add(right);
 
@@ -172,7 +173,7 @@ class PointerLockControls {
       dir.normalize();
 
       _v2.set(dir);
-      let forward = _v2.div(10);
+      let forward = _v2.div(13);
 
       _v1.set([x, y, z]).add(forward);
 
@@ -193,7 +194,7 @@ class PointerLockControls {
       dir.normalize();
 
       _v2.set(dir);
-      let backward = _v2.div(-10);
+      let backward = _v2.div(-13);
 
       _v1.set([x, y, z]).add(backward);
 

@@ -143,6 +143,15 @@ class Cube extends Object3D {
         'uv'
       )
     );
+
+    let temp = [];
+
+    for (let i = 0; i < 36; i++) {
+      temp.push(i);
+    }
+
+    this.indices = new Uint16Array(temp);
+    console.log(this);
   }
 }
 
