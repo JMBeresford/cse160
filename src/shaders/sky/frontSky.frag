@@ -74,19 +74,19 @@ void main() {
 
   finalColor += Stars(uv, uTime) * max(S(0.1, 0.6, noise), 0.1) * (1.0 - blackHole);
   finalColor += S(0.0, 0.7, cloudStr) * cloudColor * (1.0 - blackHole);
-  finalColor = mix(finalColor, fogStr * fogColor, fogStr);
+  finalColor = mix(finalColor, fogColor, fogStr);
 
   vec3 flareColor = vec3(0.7686, 0.7098, 0.8745);
 
   pos = vPos;
-  pos.xy *= rot(pow(d, 100.0));
+  pos.xy *= rot(d * 50.0);
   pos.xy *= rot(uTime * 0.001);
 
   noise = cnoise4(vec4(pos, uTime * 0.005));
 
   float innerSize = 0.002 * abs(sin(uTime * 0.005));
-  float str = min(pow((size / d), 20.0 * (sin(uTime * 0.005) + 1.5)), 1.0) - blackHole;
-  float flareStr = S(0.2, 0.3, noise * str);
+  float str = min(pow(size / d, 20.0 * (sin(uTime * 0.0075) + 1.5)), 1.0) - blackHole;
+  float flareStr = S(0.0, 0.3, noise * str);
 
   float glow = S(0.3, 0.2, d) - blackHole;
   float innerGlow = min(sqrt((innerSize / d)), 1.0);

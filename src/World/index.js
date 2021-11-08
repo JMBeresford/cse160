@@ -7,6 +7,8 @@ import frontSkyVertexShader from '../shaders/sky/frontSky.vert';
 import frontSkyFragmentShader from '../shaders/sky/frontSky.frag';
 import topSkyVertexShader from '../shaders/sky/topSky.vert';
 import topSkyFragmentShader from '../shaders/sky/topSky.frag';
+import backSkyVertexShader from '../shaders/sky/backSky.vert';
+import backSkyFragmentShader from '../shaders/sky/backSky.frag';
 
 const World = new Object3D({ position: [0, 0, 0] });
 
@@ -30,8 +32,8 @@ const backSky = new Plane({
   width: 64,
   height: 64,
 });
-backSky.vertexShader = skyVertexShader;
-backSky.fragmentShader = skyFragmentShader;
+backSky.vertexShader = backSkyVertexShader;
+backSky.fragmentShader = backSkyFragmentShader;
 backSky.transparent = false;
 
 const leftSky = new Plane({

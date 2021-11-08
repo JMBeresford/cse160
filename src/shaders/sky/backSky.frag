@@ -10,6 +10,12 @@ varying vec3 vPos;
 #pragma glslify: snoise4 = require(glsl-noise/simplex/4d)
 #define S smoothstep
 
+mat2 rot(float angle) {
+  float s = sin(angle), c = cos(angle);
+
+  return mat2(c,-s,s,c);
+}
+
 float rand2_1(vec2 p) {
   p = fract(p * vec2(123.34, 456.21));
   p += dot(p, p + 45.32);
@@ -47,56 +53,49 @@ vec4 Stars(vec2 uv, float uTime) {
   return Stars;
 }
 
-float calcHeight(vec2 uv, float depth) {
-  float rand = rand2_1(vec2(fract(depth * 345.23), depth * -123.45)) * 35.0;
-  float h = (uv.y - 3.0) * 0.3 + sin((uv.x + depth * 10.0 * rand) * 0.00005) * sin((uv.x + depth * 5.0) * 0.1)*40.3 * rand;
-
-
-  return h;
-}
-
-vec4 Mountains(vec2 uv) {
-  vec4 mtns = vec4(0.0);
-  vec3 mtnColor =vec3(0.6078, 0.6078, 0.6078);
-
-  const float numLayers = 3.0;
-
-
-  float distToCorner = 1.0 - (abs(uv.x - 100.0) / 100.0);
-
-
-  for (float i = 0.0; i <= 1.0; i += 1.0/(numLayers-1.0)) {
-    float mtn = S(0.005, -0.005, calcHeight(uv, i) - distToCorner * 3.0);
-    float brightness = i + 0.2;
-
-    mtns = mix(mtns, vec4(mtnColor * brightness, mtn), mtn);
-  }
-
-  return vec4(mtns);
-}
 
 void main() {
   float fogStr = S(0.92, 0.98, 1.0 - vUv.y);
   vec4 finalColor = vec4(0.0588, 0.0314, 0.1059, 1.0);
   vec4 cloudColor = vec4(0.0588, 0.0353, 0.0941, 1.0);
-  vec4 mtnColor =vec4(0.8941, 0.8941, 0.8941, 1.0);
+  vec4 cloudColor2 =vec4(0.102, 0.0392, 0.098, 1.0);
   vec4 fogColor = vec4(0.7686, 0.7098, 0.8745, 1.0);
 
   vec3 pos = vPos * 0.05;
   vec2 uv = vUv * 200.0;
+  float d = distance(vUv, vec2(0.5, 0.15));
+  float size = 0.25;
+  float blackHole = S(0.99, 1.0, size * 0.98 / d);
 
   float cloudStr = clamp(cnoise4(vec4(pos, uTime * 0.0005)), 0.0, 1.0);
   cloudStr += clamp(snoise4(vec4(pos * 0.5, uTime * 0.0005 + 10000.0)), 0.0, 1.0);
   float noise = clamp(cnoise4(vec4(pos, uTime * 0.0005)), 0.0, 1.0);
   noise += clamp(snoise4(vec4(pos * 0.5, uTime * 0.0005 + 10000.0)), 0.0, 1.0);
 
-  vec4 mtns = Mountains(uv);
-
-  finalColor += S(0.0, 0.7, cloudStr) * cloudColor;
-  finalColor += Stars(uv, uTime) * max(S(0.1, 0.6, noise), 0.1);
-  finalColor = mix(finalColor, mtns, mtns.a);
+  finalColor += Stars(uv, uTime) * max(S(0.1, 0.6, noise), 0.1) * (1.0 - blackHole);
+  finalColor += S(0.0, 0.7, cloudStr) * cloudColor * (1.0 - blackHole);
   finalColor = mix(finalColor, fogColor, fogStr);
-  finalColor.rb += normalize(vPos.xy) * 0.05 * (1.0 - fogStr);
+
+  vec3 flareColor = vec3(0.7686, 0.7098, 0.8745);
+
+  pos = vPos;
+  pos.xy *= rot(uTime * 0.0005);
+
+  noise = cnoise4(vec4(pos, uTime * 0.005));
+
+  float innerSize = 0.002 * abs(sin(uTime * 0.005));
+  float str = min(pow(size / d, 20.0 * (sin(uTime * -0.0075) + 1.5)), 1.0) - blackHole;
+  float flareStr = S(0.0, 0.3, noise * str);
+
+  float glow = S(0.3, 0.2, d) - blackHole;
+  float innerGlow = min(sqrt((innerSize / d)), 1.0);
+
+  finalColor += str; // black hole
+  finalColor += flareStr * vec4(flareColor, 1.0); // outer flare
+  finalColor += vec4(0.2863, 0.0, 0.0, 1.0) * glow;
+  finalColor += vec4(0.149, 0.0, 1.0, 1.0) * innerGlow * blackHole;
+
+  finalColor.rb += normalize(vPos.xy) * 0.05 * (1.0 - blackHole) * (1.0 - fogStr);
 
   gl_FragColor = finalColor;
 }
