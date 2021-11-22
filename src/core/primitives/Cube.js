@@ -1,13 +1,8 @@
-import { Matrix4 } from '../../../lib/cuon-matrix-cse160';
-import { Object3D, Attribute, Uniform } from '../Object3D';
+import { Object3D, Attribute } from '../Object3D';
 
 class Cube extends Object3D {
-  constructor({
-    position = [0, 0, 0],
-    rotation = [0, 0, 0],
-    scale = [1, 1, 1],
-  }) {
-    super({ position, scale, rotation });
+  constructor(position = [0, 0, 0], rotation = [0, 0, 0], scale = [1, 1, 1]) {
+    super(position, rotation, scale);
 
     this.type = 'cube';
     this.visible = true;
@@ -144,14 +139,34 @@ class Cube extends Object3D {
       )
     );
 
+    this.attributes.push(
+      new Attribute(
+        new Float32Array([
+          // FRONT
+          0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+          // LEFT
+          -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
+          // RIGHT
+          1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+          // TOP
+          0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+          // BACK
+          0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
+          // BOTTOM
+          0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
+        ]),
+        3,
+        'normal'
+      )
+    );
+
     let temp = [];
 
     for (let i = 0; i < 36; i++) {
       temp.push(i);
     }
 
-    this.indices = new Uint8Array(temp);
-    console.log(this);
+    this.indices = new Uint16Array(temp);
   }
 }
 

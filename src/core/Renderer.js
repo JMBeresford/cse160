@@ -1,10 +1,5 @@
-import { Matrix4 } from '../../lib/cuon-matrix-cse160';
-import defaultVertexShader from './shaders/default.vert';
-import defaultFragmentShader from './shaders/default.frag';
-import { getWebGLContext, createProgram } from '../../lib/cuon-utils';
+import { getWebGLContext } from '../../lib/cuon-utils';
 
-var _mat1 = new Matrix4();
-var _mat2 = new Matrix4();
 class Renderer {
   constructor(canvas) {
     if (canvas === null) {
@@ -17,7 +12,7 @@ class Renderer {
 
     this.gl = getWebGLContext(canvas, false, {
       alpha: true,
-      premultipliedAlpha: false,
+      premultipliedAlpha: true,
     });
 
     window.addEventListener('resize', (e) => {
@@ -35,11 +30,30 @@ class Renderer {
     this.viewMatrixLocation = null;
     this.projectionMatrixLocation = null;
     this.resolutionLocation = null;
+    this.lights = {
+      ambient: { intensity: null, color: null },
+      point: {
+        intensity: null,
+        color: null,
+        position: null,
+        specularExponent: null,
+      },
+      spot: {
+        intensity: null,
+        color: null,
+        position: null,
+        specularExponent: null,
+        target: null,
+        angle: null,
+      },
+    };
 
     this.gl.clearColor(0, 0, 0, 1);
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.enable(this.gl.BLEND);
-    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+    this.gl.enable(this.gl.CULL_FACE);
+    this.gl.blendFunc(this.gl.ONE, this.gl.ONE_MINUS_SRC_ALPHA);
+    this.gl.cullFace(this.gl.BACK);
     this.clear();
   }
 
@@ -143,10 +157,8 @@ class Renderer {
     }
 
     for (let attribute of obj.attributes) {
-      let created = false;
       if (attribute.buffer === null) {
         attribute.buffer = this.gl.createBuffer();
-        created = true;
       }
 
       this.gl.bindBuffer(this.gl.ARRAY_BUFFER, attribute.buffer);
@@ -173,6 +185,7 @@ class Renderer {
         0,
         0
       );
+
       this.gl.enableVertexAttribArray(attribPtr);
     }
 
@@ -183,6 +196,73 @@ class Renderer {
           this.gl.program,
           name
         );
+      }
+
+      if (
+        name === 'uAmbientIntensity' &&
+        this.lights.ambient.intensity !== null
+      ) {
+        uniforms[name].value[0] = this.lights.ambient.intensity;
+      }
+
+      if (name === 'uAmbientColor' && this.lights.ambient.color !== null) {
+        uniforms[name].value = this.lights.ambient.color;
+      }
+
+      if (
+        name === 'uPointLightIntensity' &&
+        this.lights.point.intensity !== null
+      ) {
+        uniforms[name].value[0] = this.lights.point.intensity;
+      }
+
+      if (name === 'uPointLightColor' && this.lights.point.color !== null) {
+        uniforms[name].value = this.lights.point.color;
+      }
+
+      if (name === 'uPointLightPos' && this.lights.point.position !== null) {
+        uniforms[name].value = this.lights.point.position;
+      }
+
+      if (
+        name === 'uSpecularExponent' &&
+        this.lights.point.specularExponent !== null
+      ) {
+        uniforms[name].value[0] = this.lights.point.specularExponent;
+      }
+
+      if (
+        name === 'uSpotLightIntensity' &&
+        this.lights.spot.intensity !== null
+      ) {
+        uniforms[name].value[0] = this.lights.spot.intensity;
+      }
+
+      if (name === 'uSpotLightColor' && this.lights.spot.color !== null) {
+        uniforms[name].value = this.lights.spot.color;
+      }
+
+      if (name === 'uSpotLightPos' && this.lights.spot.position !== null) {
+        uniforms[name].value = this.lights.spot.position;
+      }
+
+      if (
+        name === 'uSpotSpecularExponent' &&
+        this.lights.spot.specularExponent !== null
+      ) {
+        uniforms[name].value[0] = this.lights.spot.specularExponent;
+      }
+
+      if (name === 'uSpotLightAngle' && this.lights.spot.angle !== null) {
+        uniforms[name].value[0] = (this.lights.spot.angle * Math.PI) / 180;
+      }
+
+      if (name === 'uSpotLightTarget' && this.lights.spot.target !== null) {
+        uniforms[name].value = this.lights.spot.target;
+      }
+
+      if (name === 'uCamPos') {
+        uniforms[name].value = camera.position.elements;
       }
 
       let uniformPtr = uniforms[name].location;
@@ -218,6 +298,7 @@ class Renderer {
             this.gl.bindTexture(this.gl.TEXTURE_2D, obj.texture);
             this.gl.activeTexture(this.gl.TEXTURE0);
           }
+
           this.gl.uniform1i(uniformPtr, ...uniforms[name].value);
           break;
         }
@@ -241,23 +322,12 @@ class Renderer {
         this.gl.DYNAMIC_DRAW
       );
 
-      if (obj.type === 'rock') {
-        let uniformPtr = uniforms['uBrightness'].location;
-        let brightness = 1;
-        let stagger = obj.indices.length / 6;
-        for (let i = 0; i < obj.indices.length; i += stagger) {
-          this.gl.drawElements(drawType, stagger, this.gl.UNSIGNED_BYTE, i);
-          this.gl.uniform1f(uniformPtr, brightness);
-          brightness -= 0.1;
-        }
-      } else {
-        this.gl.drawElements(
-          drawType,
-          obj.indices.length,
-          this.gl.UNSIGNED_SHORT,
-          0
-        );
-      }
+      this.gl.drawElements(
+        drawType,
+        obj.indices.length,
+        this.gl.UNSIGNED_SHORT,
+        0
+      );
     }
 
     this.gl.enable(this.gl.DEPTH_TEST);
@@ -271,10 +341,32 @@ class Renderer {
     let transparent = [];
 
     scene.traverse((obj) => {
+      if (obj.type === 'ambient light') {
+        this.lights.ambient.intensity = obj.intensity;
+        this.lights.ambient.color = obj.uniforms.uColor.value;
+      }
+
+      if (obj.type === 'point light') {
+        this.lights.point.intensity = obj.intensity;
+        this.lights.point.color = obj.uniforms.uColor.value;
+        this.lights.point.position = obj.position.elements;
+        this.lights.point.specularExponent = obj.specularExponent;
+      }
+
+      if (obj.type === 'spot light') {
+        this.lights.spot.intensity = obj.intensity;
+        this.lights.spot.color = obj.uniforms.uColor.value;
+        this.lights.spot.position = obj.position.elements;
+        this.lights.spot.specularExponent = obj.specularExponent;
+        this.lights.spot.target = obj.target;
+        this.lights.spot.angle = obj.cutoffAngle;
+      }
+
       if (obj.depthTest == false) {
         noDepthTest.push(obj);
         return;
       }
+
       if (obj.transparent == true) {
         transparent.push(obj);
         return;

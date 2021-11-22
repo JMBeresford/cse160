@@ -2,16 +2,16 @@ import { Matrix4 } from '../../../lib/cuon-matrix-cse160';
 import { Object3D, Attribute } from '../Object3D';
 
 class Plane extends Object3D {
-  constructor({
-    position = [0, 0, 0],
-    rotation = [0, 0, 0],
-    scale = [1, 1, 1],
+  constructor(
     width = 1,
     height = 1,
     widthSegments = 1,
     heightSegments = 1,
-  }) {
-    super({ position, scale, rotation });
+    position = [0, 0, 0],
+    rotation = [0, 0, 0],
+    scale = [1, 1, 1]
+  ) {
+    super(position, rotation, scale);
 
     this.type = 'plane';
     this.visible = true;
@@ -32,6 +32,7 @@ class Plane extends Object3D {
     const vertices = [];
     const idx = [];
     const uvs = [];
+    const normals = [];
 
     for (let i = 0; i < gridY1; i++) {
       const y = i * seg_height - hMid;
@@ -40,6 +41,9 @@ class Plane extends Object3D {
         let x = j * seg_width - wMid;
 
         vertices.push(x, -y, 0);
+
+        // facing towards camera at first
+        normals.push(0, 0, 1);
 
         uvs.push(j / gridX);
         uvs.push(1 - i / gridY);
@@ -60,6 +64,7 @@ class Plane extends Object3D {
 
     this.attributes.push(new Attribute(vertices, 3, 'aPosition'));
     this.attributes.push(new Attribute(uvs, 2, 'uv'));
+    this.attributes.push(new Attribute(normals, 3, 'normal'));
 
     this.indices = new Uint16Array(idx);
   }

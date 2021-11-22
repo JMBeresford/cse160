@@ -6,13 +6,13 @@ let p = new Vector3();
 let s = new Vector3();
 
 class Pile extends Object3D {
-  constructor({
+  constructor(
     amount = 3,
     position = [0, 0, 0],
     rotation = [0, 0, 0],
-    scale = [0.5, 0.25, 0.325],
-  }) {
-    super({ position, scale, rotation });
+    scale = [0.5, 0.25, 0.325]
+  ) {
+    super(position, rotation);
     let w = scale[0];
     let h = scale[1];
 
@@ -21,29 +21,29 @@ class Pile extends Object3D {
     for (let layer = 1; layer <= amount; layer++) {
       if (layer % 2 === 0) {
         for (let evenrock = 0; evenrock < layer; evenrock++) {
-          let r = new Rock({
-            position: [
+          let r = new Rock(
+            [
               (layer / 2 - 0.5 - evenrock) * w + offset,
               (amount - 1 - layer) * h + h / 2 + offset,
               0,
             ],
-            scale: [scale[0], scale[1], scale[2] + layer * 0.05],
-            rotation: [0, Math.random() * 15, 0],
-          });
+            [0, 0, 0],
+            [scale[0], scale[1], scale[2] + layer * 0.1]
+          );
 
           this.add(r);
         }
       } else {
         for (let oddrock = 0; oddrock < layer; oddrock++) {
-          let r = new Rock({
-            position: [
+          let r = new Rock(
+            [
               (Math.floor(layer / 2) - oddrock) * w + offset,
               (amount - 1 - layer) * h + h / 2 + offset,
               0,
             ],
-            scale: [scale[0], scale[1], scale[2] + layer * 0.05],
-            rotation: [0, Math.random() * 15, 0],
-          });
+            [0, 0, 0],
+            [scale[0], scale[1], scale[2] + layer * 0.1]
+          );
 
           this.add(r);
         }

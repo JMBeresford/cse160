@@ -10,61 +10,49 @@ import topSkyFragmentShader from '../shaders/sky/topSky.frag';
 import backSkyVertexShader from '../shaders/sky/backSky.vert';
 import backSkyFragmentShader from '../shaders/sky/backSky.frag';
 
-const World = new Object3D({ position: [0, 0, 0] });
+const World = new Object3D();
 
-// for calculating fog
-Floor.uniforms['uCameraPos'] = new Uniform(null, 3, 'vec3');
 World.floor = Floor;
 
-const frontSky = new Plane({
-  position: [0, 32, 32],
-  rotation: [0, 180, 0],
-  width: 64,
-  height: 64,
-});
+const frontSky = new Plane(64, 64);
+frontSky.setPosition(0, 32, 32);
+frontSky.setRotation(0, 180, 0);
 frontSky.vertexShader = frontSkyVertexShader;
 frontSky.fragmentShader = frontSkyFragmentShader;
 frontSky.transparent = false;
+frontSky.depthTest = false;
 
-const backSky = new Plane({
-  position: [0, 32, -32],
-  rotation: [0, 180, 0],
-  width: 64,
-  height: 64,
-});
+const backSky = new Plane(64, 64);
+backSky.setPosition(0, 32, -32);
+backSky.setRotation(0, 0, 0);
 backSky.vertexShader = backSkyVertexShader;
 backSky.fragmentShader = backSkyFragmentShader;
 backSky.transparent = false;
+backSky.depthTest = false;
 
-const leftSky = new Plane({
-  position: [32, 32, 0],
-  rotation: [0, -90, 0],
-  width: 64,
-  height: 64,
-});
+const leftSky = new Plane(64, 64);
+leftSky.setPosition(32, 32, 0);
+leftSky.setRotation(0, -90, 0);
 leftSky.vertexShader = skyVertexShader;
 leftSky.fragmentShader = skyFragmentShader;
 leftSky.transparent = false;
+leftSky.depthTest = false;
 
-const rightSky = new Plane({
-  position: [-32, 32, 0],
-  rotation: [0, 90, 0],
-  width: 64,
-  height: 64,
-});
+const rightSky = new Plane(64, 64);
+rightSky.setPosition(-32, 32, 0);
+rightSky.setRotation(0, 90, 0);
 rightSky.vertexShader = skyVertexShader;
 rightSky.fragmentShader = skyFragmentShader;
 rightSky.transparent = false;
+rightSky.depthTest = false;
 
-const topSky = new Plane({
-  position: [0, 64, 0],
-  rotation: [90, 0, 0],
-  width: 64,
-  height: 64,
-});
+const topSky = new Plane(64, 64);
+topSky.setPosition(0, 64, 0);
+topSky.setRotation(90, 0, 0);
 topSky.vertexShader = topSkyVertexShader;
 topSky.fragmentShader = topSkyFragmentShader;
 topSky.transparent = false;
+topSky.depthTest = false;
 
 World.add([Floor, frontSky, leftSky, rightSky, backSky, topSky]);
 

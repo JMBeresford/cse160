@@ -4,15 +4,15 @@ import { Object3D } from './Object3D';
 var _v3 = new Vector3();
 
 class PerspectiveCamera extends Object3D {
-  constructor({
-    position,
+  constructor(
+    position = [0, 0, 0],
     target = [0, 0, 0],
     fov = 60,
     near = 0.01,
     far = 100,
-    rotation = [0, 0, 0],
-  }) {
-    super({ position, rotation });
+    rotation = [0, 0, 0]
+  ) {
+    super(position, rotation);
 
     window.addEventListener('resize', (e) => {
       this.aspect = e.target.innerWidth / e.target.innerHeight;
