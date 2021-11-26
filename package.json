@@ -1,8 +1,7 @@
 {
-  "name": "webgl_template",
+  "name": "threejs-template",
   "version": "1.0.0",
-  "description": "Template for basic webGL projects utilizing webpack.",
-  "private": true,
+  "description": "Template for vanilla Three.js projects",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack serve --mode=development",
@@ -10,29 +9,33 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JMBeresford/webGL_template.git"
+    "url": "git+https://github.com/JMBeresford/threejs-template.git"
   },
-  "keywords": [
-    "webGL",
-    "template",
-    "webpack"
-  ],
   "author": "John Beresford",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/JMBeresford/webGL_template/issues"
+    "url": "https://github.com/JMBeresford/threejs-template/issues"
   },
-  "homepage": "https://github.com/JMBeresford/webGL_template#readme",
+  "homepage": "https://github.com/JMBeresford/threejs-template#readme",
   "dependencies": {
-    "css-loader": "^6.3.0",
+    "css-loader": "^6.5.1",
+    "file-loader": "^6.2.0",
+    "glsl-inverse": "^1.0.0",
+    "glsl-map": "^1.0.1",
+    "glsl-noise": "^0.0.0",
+    "glsl-transpose": "^1.0.0",
+    "glslify": "^7.1.1",
     "glslify-loader": "^2.0.0",
-    "html-loader": "^2.1.2",
-    "html-webpack-plugin": "^5.3.2",
-    "mini-css-extract-plugin": "^2.3.0",
+    "html-loader": "^3.0.1",
+    "html-webpack-plugin": "^5.5.0",
+    "mini-css-extract-plugin": "^2.4.5",
     "raw-loader": "^4.0.2",
-    "style-loader": "^3.3.0",
-    "webpack": "^5.55.1",
-    "webpack-cli": "^4.8.0",
-    "webpack-dev-server": "^4.3.0"
+    "stats.js": "^0.17.0",
+    "style-loader": "^3.3.1",
+    "three": "^0.134.0",
+    "tweakpane": "^3.0.6",
+    "webpack": "^5.64.4",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.6.0"
   }
 }
