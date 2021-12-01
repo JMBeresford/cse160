@@ -1,6 +1,8 @@
-import { BoxGeometry, Mesh, MeshStandardMaterial } from 'three';
 import Experience from '..';
 import Environment from './Environment';
+import SphereOcean from './SphereOcean';
+import Platform from './Platform';
+import Flames from './Flames';
 
 export default class World {
   constructor() {
@@ -10,14 +12,17 @@ export default class World {
 
     this.resources = this.experience.resources;
 
-    this.resources.on('ready', () => {
-      this.environment = new Environment();
-    });
-
     return this;
   }
 
   update() {
     if (this.fox) this.fox.update();
+  }
+
+  load() {
+    this.environment = new Environment();
+    this.ocean = new SphereOcean();
+    this.platform = new Platform();
+    this.flames = new Flames();
   }
 }

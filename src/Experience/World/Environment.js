@@ -1,5 +1,6 @@
-import { DirectionalLight, sRGBEncoding } from 'three';
+import { AmbientLight, DirectionalLight } from 'three';
 import Experience from '..';
+import Skydome from './Skydome';
 
 export default class Environment {
   constructor() {
@@ -8,30 +9,25 @@ export default class Environment {
 
     this.scene = this.experience.scene;
     this.resources = this.experience.resources;
+    this.skydome = new Skydome();
+
     this.setSun();
-    this.setEnvMap();
+    this.setAmbient();
 
     return this;
   }
 
   setSun() {
-    this.sun = new DirectionalLight('#ffffff', 4);
+    this.sun = new DirectionalLight('white', 1);
+    this.sun.position.set(0, 68.404, -187.94);
     this.sun.castShadow = true;
-    this.sun.shadow.camera.far = 15;
-    this.sun.shadow.mapSize.set(1024, 1024);
-    this.sun.shadow.normalBias = 0.05;
-    this.sun.position.set(3, 3, -2.25);
+
     this.scene.add(this.sun);
   }
 
-  setEnvMap() {
-    this.envMap = {
-      intensity: 0.4,
-      texture: this.resources.items['envMapTexture'],
-    };
+  setAmbient() {
+    this.ambientLight = new AmbientLight('#440066', 0.1);
 
-    this.envMap.texture.encoding = sRGBEncoding;
-
-    this.scene.environment = this.envMap.texture;
+    this.scene.add(this.ambientLight);
   }
 }

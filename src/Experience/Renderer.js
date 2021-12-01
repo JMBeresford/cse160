@@ -19,46 +19,6 @@ export default class Renderer {
     this.camera = this.experience.camera;
     this.debug = this.experience.debug;
 
-    if (this.debug.active) {
-      this.debugFolder = this.debug.pane.addFolder({
-        title: 'Renderer',
-        expanded: false,
-      });
-
-      this.debugFolder
-        .addButton({ title: 'Filmic Tone Mapping' })
-        .on('click', () => {
-          this.instance.toneMapping = ACESFilmicToneMapping;
-          this.scene.traverse((child) => {
-            if (child instanceof Mesh) {
-              child.material.needsUpdate = true;
-            }
-          });
-        });
-
-      this.debugFolder
-        .addButton({ title: 'Reinhard Tone Mapping' })
-        .on('click', () => {
-          this.instance.toneMapping = ReinhardToneMapping;
-          this.scene.traverse((child) => {
-            if (child instanceof Mesh) {
-              child.material.needsUpdate = true;
-            }
-          });
-        });
-
-      this.debugFolder
-        .addButton({ title: 'Cineon Tone Mapping' })
-        .on('click', () => {
-          this.instance.toneMapping = CineonToneMapping;
-          this.scene.traverse((child) => {
-            if (child instanceof Mesh) {
-              child.material.needsUpdate = true;
-            }
-          });
-        });
-    }
-
     this.setInstance(shadows);
 
     return this;
@@ -73,7 +33,7 @@ export default class Renderer {
     this.instance.toneMappingExposure = 1.25;
     this.instance.shadowMap.enabled = shadows;
     this.instance.shadowMap.type = PCFSoftShadowMap;
-    this.instance.setClearColor('#111118');
+    this.instance.setClearColor('#111122');
     this.instance.setSize(this.sizes.width, this.sizes.height);
     this.instance.setPixelRatio(this.sizes.pixelRatio);
   }

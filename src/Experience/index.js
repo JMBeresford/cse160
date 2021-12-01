@@ -3,6 +3,7 @@ import Camera from './Camera';
 import Renderer from './Renderer';
 import { Mesh, Scene } from 'three';
 import World from './World';
+import Loading from './Loading';
 import sources from './sources';
 
 export default class Experience {
@@ -47,6 +48,8 @@ export default class Experience {
       this.update();
     });
 
+    this.regressLevel = 0;
+
     /**
      * Scene
      */
@@ -65,8 +68,9 @@ export default class Experience {
     /**
      * Resources
      */
-
     this.resources = new Resources(sources);
+
+    this.loading = new Loading();
 
     /**
      * World
@@ -82,9 +86,19 @@ export default class Experience {
   }
 
   update() {
+    if (this.debug.active) {
+      this.debug.stats.begin();
+    }
+
     this.camera.update();
     this.renderer.update();
-    this.world.update();
+    if (this.world) {
+      this.world.update();
+    }
+
+    if (this.debug.active) {
+      this.debug.stats.end();
+    }
   }
 
   destroy() {

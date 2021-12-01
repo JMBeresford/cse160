@@ -20,14 +20,15 @@ export default class Resources extends EventEmitter {
   }
 
   setLoaders() {
-    this.loaders = {};
     this.loaders = {
-      ...this.loaders,
       gltfLoader: new GLTFLoader(),
       textureLoader: new TextureLoader(),
       cubeTextureLoader: new CubeTextureLoader(),
       dracoLoader: new DRACOLoader(),
     };
+
+    this.loaders.dracoLoader.setDecoderPath('draco/');
+    this.loaders.gltfLoader.setDRACOLoader(this.loaders.dracoLoader);
   }
 
   startLoading() {
