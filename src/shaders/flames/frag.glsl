@@ -77,7 +77,7 @@ void main() {
 
   float distFromFocus = clamp(distance(uv, FOCUS) * 4.0, 0.0, 1.0);
 
-  float str = S(0.8, 0.3, distFromFocus);
+  float str = S(1.0, 0.1, distFromFocus);
   float innerStr = S(0.7, 0.1, distFromFocus);
 
   float x = abs(uv.x -0.5);
@@ -89,6 +89,7 @@ void main() {
   vec2 distortion = vec2(fbm(vec3(uv * 3.0, fract(uv.y))), -fbm(vec3(uv * 4.0, fract(uv.x))));
 
   uv += distortion;
+  uv += fract(vPos.x * 2342.2) * 10.0;
   uv.y -= uTime * 0.5;
 
   // uv += vec2(0.5, 0.4);
