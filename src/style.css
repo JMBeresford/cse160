@@ -8,6 +8,10 @@
   overflow: hidden;
 }
 
+body {
+  background-color: rgb(9.0015, 9.0015, 18.9975);
+}
+
 #landing {
   position: fixed;
   inset: -5px;

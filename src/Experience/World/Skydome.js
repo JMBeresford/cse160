@@ -50,9 +50,9 @@ export default class Skydome {
   setUniforms() {
     this.uniforms = {
       uTime: { value: this.clock.elapsed },
-      uColor: { value: new Color('#292124') },
+      uColor: { value: new Color('#161113') },
       uFogColor: { value: new Color('#151111') },
-      uCloudColor: { value: new Color('#fb8c90') },
+      uCloudColor: { value: new Color('#ff4148') },
     };
 
     this.clock.on('tick', () => {

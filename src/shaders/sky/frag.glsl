@@ -79,7 +79,7 @@ void main() {
 
   float distFromSun = distance(vPos, SUN_POS) / 200.0;
 
-  vec3 color = vec3(0.0);
+  vec3 color = uColor;
 
   float sun = 0.1 / distFromSun;
   color += sun;

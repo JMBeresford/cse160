@@ -18,7 +18,7 @@ export default class Environment {
   }
 
   setSun() {
-    this.sun = new DirectionalLight('white', 1);
+    this.sun = new DirectionalLight('white', 10);
     this.sun.position.set(0, 68.404, -187.94);
     this.sun.castShadow = true;
 
